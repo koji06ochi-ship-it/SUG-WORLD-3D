@@ -24,15 +24,28 @@ static func install(scene: Node3D) -> void:
     var root := Node3D.new()
     root.name = "WorldLandscape01"
     scene.add_child(root)
-    # Layered mountain silhouettes around the playable valley.
-    for i in range(16):
-        var x := -76.0 + float(i) * 10.0
-        var z := 73.0 + float(i % 3) * 8.0
-        var mountain := CylinderMesh.new()
-        mountain.top_radius = 0.0
-        mountain.bottom_radius = 16.0 + float(i % 4) * 3.0
-        mountain.height = 26.0 + float(i % 5) * 6.0
-        _shape(root, "Mountain", mountain, Vector3(x, mountain.height * 0.5 - 1.0, z), "#6d8e80" if i % 2 == 0 else "#8ca39a")
+    # Low-poly ridge peaks: taper into the horizon, no large flat wall.
+    var ridge_rng := RandomNumberGenerator.new()
+    ridge_rng.seed = 20261102
+    for row in range(3):
+        for i in range(13):
+            var x := -84.0 + float(i) * 14.0 + ridge_rng.randf_range(-3.0, 3.0)
+            var z := 105.0 + float(row) * 21.0 + ridge_rng.randf_range(-4.0, 4.0)
+            var peak_height := ridge_rng.randf_range(13.0, 29.0) * (1.0 + float(row) * 0.15)
+            var mountain := CylinderMesh.new()
+            mountain.top_radius = 0.0
+            mountain.bottom_radius = ridge_rng.randf_range(12.0, 19.0)
+            mountain.height = peak_height
+            mountain.radial_segments = 7
+            var color := "#708c7f" if row == 0 else ("#879b99" if row == 1 else "#a0adad")
+            _shape(root, "RidgePeak", mountain, Vector3(x, peak_height * 0.5 - 2.0, z), color)
+            if row > 0 and peak_height > 25.0:
+                var cap := CylinderMesh.new()
+                cap.top_radius = 0.0
+                cap.bottom_radius = mountain.bottom_radius * 0.22
+                cap.height = peak_height * 0.24
+                cap.radial_segments = 7
+                _shape(root, "SnowCap", cap, Vector3(x, peak_height * 0.88 - 2.0, z), "#e2e9e4")
     # Water surface is kept inside the existing lake footprint.
     var water := PlaneMesh.new()
     water.size = Vector2(19.6, 11.6)
