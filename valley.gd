@@ -6,6 +6,7 @@ var heading := 0.0
 var lake_position := Vector3(-12, 0, 22)
 var house_position := Vector3(8, 0, 22)
 var state := WorldState.new()
+var journey := WorldJourney.new()
 var navigation := WorldNavigation.new()
 var overlay: PanelContainer
 var overlay_open := false
@@ -28,6 +29,7 @@ func _ready() -> void:
         player.position = state.world_position
         fish_attempts = int(state.inventory.get("fish", 0))
     _refresh_status()
+    status.text += " | " + journey.hint()
 
 func _refresh_status() -> void:
     status.text = "S.u.G WORLD | Fish %d | Seeds %d | Planted %d" % [
@@ -195,17 +197,20 @@ func _action(action: String) -> void:
             status.text = "湖に近づこう"
         else:
             fish_attempts += 1
+            journey.mark("Fish")
             state.award_once("fish_%d" % fish_attempts, "fish", 1)
             status.text = "魚が釣れた"
             if fish_attempts == 2 and state.award_once("lake_key_first", "key", 1):
                 status.text = "古い鍵が釣れた！"
     elif action == "Search":
+        journey.mark("Search")
         status.text = "種を発見した" if state.award_once("seed_first", "seeds", 1) else "ここはもう調べた"
     elif action == "Garden":
         if player.position.distance_to(house_position) < 7 and int(state.inventory.get("seeds", 0)) > 0:
             state.inventory["seeds"] = int(state.inventory["seeds"]) - 1
             state.garden["planted"] = int(state.garden.get("planted", 0)) + 1
             status.text = "庭に種を植えた"
+            journey.mark("Garden")
         else:
             status.text = "種を持って家に近づこう"
 
@@ -230,6 +235,9 @@ func _unhandled_input(event: InputEvent) -> void:
         touch_direction = touch_direction.limit_length(1.0)
 
 func _physics_process(delta: float) -> void:
+    journey.progress(delta)
+    if player.position.distance_to(Vector3(-6.5, 0.8, 37)) < 4.5:
+        journey.mark("Gate")
     var forward := (1.0 if (Input.is_key_pressed(KEY_W) or Input.is_key_pressed(KEY_UP)) else 0.0) - (1.0 if (Input.is_key_pressed(KEY_S) or Input.is_key_pressed(KEY_DOWN)) else 0.0)
     var turn := (1.0 if (Input.is_key_pressed(KEY_D) or Input.is_key_pressed(KEY_RIGHT)) else 0.0) - (1.0 if (Input.is_key_pressed(KEY_A) or Input.is_key_pressed(KEY_LEFT)) else 0.0)
     forward = clampf(forward + touch_forward, -1.0, 1.0)
