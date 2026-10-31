@@ -11,6 +11,9 @@ var overlay: PanelContainer
 var overlay_open := false
 var fish_attempts := 0
 var status: Label
+var touch_direction := Vector2.ZERO
+var touch_origin := Vector2.ZERO
+var touch_id := -1
 var touch_forward := 0.0
 var touch_turn := 0.0
 
@@ -18,6 +21,7 @@ func _ready() -> void:
     _create_environment()
     _create_player()
     _create_ui()
+    set_process_unhandled_input(true)
     if state.load_save():
         player.position = state.world_position
         fish_attempts = int(state.inventory.get("fish", 0))
@@ -195,11 +199,27 @@ func _action(action: String) -> void:
         else:
             status.text = "種を持って家に近づこう"
 
+func _unhandled_input(event: InputEvent) -> void:
+    if event is InputEventScreenTouch:
+        if event.pressed and event.position.x < get_viewport().get_visible_rect().size.x * 0.5 and event.position.y > get_viewport().get_visible_rect().size.y * 0.45 and touch_id == -1:
+            touch_id = event.index
+            touch_origin = event.position
+            touch_direction = Vector2.ZERO
+        elif not event.pressed and event.index == touch_id:
+            touch_id = -1
+            touch_direction = Vector2.ZERO
+    elif event is InputEventScreenDrag and event.index == touch_id:
+        touch_direction = (event.position - touch_origin) / 65.0
+        touch_direction = touch_direction.limit_length(1.0)
+
 func _physics_process(delta: float) -> void:
     var forward := (1.0 if (Input.is_key_pressed(KEY_W) or Input.is_key_pressed(KEY_UP)) else 0.0) - (1.0 if (Input.is_key_pressed(KEY_S) or Input.is_key_pressed(KEY_DOWN)) else 0.0)
     var turn := (1.0 if (Input.is_key_pressed(KEY_D) or Input.is_key_pressed(KEY_RIGHT)) else 0.0) - (1.0 if (Input.is_key_pressed(KEY_A) or Input.is_key_pressed(KEY_LEFT)) else 0.0)
     forward = clampf(forward + touch_forward, -1.0, 1.0)
     turn = clampf(turn + touch_turn, -1.0, 1.0)
+    if touch_id != -1:
+        forward = -touch_direction.y
+        turn = touch_direction.x
     if overlay_open:
         forward = 0.0
         turn = 0.0
