@@ -209,6 +209,13 @@ func _action(action: String) -> void:
         else:
             status.text = "種を持って家に近づこう"
 
+func _notification(what: int) -> void:
+    if what == NOTIFICATION_WM_CLOSE_REQUEST or what == NOTIFICATION_APPLICATION_PAUSED:
+        if is_instance_valid(player):
+            state.world_position = player.position
+            state.save()
+
+
 func _unhandled_input(event: InputEvent) -> void:
     if event is InputEventScreenTouch:
         if event.pressed and event.position.x < get_viewport().get_visible_rect().size.x * 0.5 and event.position.y > get_viewport().get_visible_rect().size.y * 0.45 and touch_id == -1:
