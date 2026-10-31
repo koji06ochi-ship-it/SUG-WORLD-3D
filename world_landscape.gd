@@ -24,28 +24,38 @@ static func install(scene: Node3D) -> void:
     var root := Node3D.new()
     root.name = "WorldLandscape01"
     scene.add_child(root)
-    # Low-poly ridge peaks: taper into the horizon, no large flat wall.
+    # Irregular distant ridgeline built as a continuous faceted mesh, not a wall of cones.
     var ridge_rng := RandomNumberGenerator.new()
     ridge_rng.seed = 20261102
     for row in range(3):
-        for i in range(13):
-            var x := -84.0 + float(i) * 14.0 + ridge_rng.randf_range(-3.0, 3.0)
-            var z := 105.0 + float(row) * 21.0 + ridge_rng.randf_range(-4.0, 4.0)
-            var peak_height := ridge_rng.randf_range(13.0, 29.0) * (1.0 + float(row) * 0.15)
-            var mountain := CylinderMesh.new()
-            mountain.top_radius = 0.0
-            mountain.bottom_radius = ridge_rng.randf_range(12.0, 19.0)
-            mountain.height = peak_height
-            mountain.radial_segments = 7
-            var color := "#708c7f" if row == 0 else ("#879b99" if row == 1 else "#a0adad")
-            _shape(root, "RidgePeak", mountain, Vector3(x, peak_height * 0.5 - 2.0, z), color)
-            if row > 0 and peak_height > 25.0:
-                var cap := CylinderMesh.new()
-                cap.top_radius = 0.0
-                cap.bottom_radius = mountain.bottom_radius * 0.22
-                cap.height = peak_height * 0.24
-                cap.radial_segments = 7
-                _shape(root, "SnowCap", cap, Vector3(x, peak_height * 0.88 - 2.0, z), "#e2e9e4")
+        var verts := PackedVector3Array()
+        var indices := PackedInt32Array()
+        var cols := PackedColorArray()
+        var distance := 95.0 + float(row) * 23.0
+        for i in range(35):
+            var x := -105.0 + float(i) * 6.0
+            var height := 9.0 + 7.0 * absf(sin(float(i) * 0.37 + float(row))) + ridge_rng.randf_range(0.0, 8.0)
+            height *= 1.0 + float(row) * 0.16
+            verts.append(Vector3(x, -2.0, distance))
+            verts.append(Vector3(x, height, distance + ridge_rng.randf_range(-2.0, 2.0)))
+            var col := Color("#6c897c") if row == 0 else (Color("#8a9e9d") if row == 1 else Color("#a9b7b4"))
+            cols.append(col.darkened(0.12))
+            cols.append(col)
+        for i in range(34):
+            var k := i * 2
+            indices.append_array(PackedInt32Array([k, k + 1, k + 2, k + 1, k + 3, k + 2]))
+        var arrays := []
+        arrays.resize(Mesh.ARRAY_MAX)
+        arrays[Mesh.ARRAY_VERTEX] = verts
+        arrays[Mesh.ARRAY_COLOR] = cols
+        arrays[Mesh.ARRAY_INDEX] = indices
+        var ridge_mesh := ArrayMesh.new()
+        ridge_mesh.add_surface_from_arrays(Mesh.PRIMITIVE_TRIANGLES, arrays)
+        var ridge := _shape(root, "ContinuousRidge", ridge_mesh, Vector3.ZERO, "#ffffff")
+        var ridge_material := StandardMaterial3D.new()
+        ridge_material.vertex_color_use_as_albedo = true
+        ridge_material.cull_mode = BaseMaterial3D.CULL_DISABLED
+        ridge.material_override = ridge_material
     # Water surface is kept inside the existing lake footprint.
     var water := PlaneMesh.new()
     water.size = Vector2(19.6, 11.6)
