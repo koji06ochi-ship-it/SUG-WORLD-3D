@@ -1,0 +1,32 @@
+name: Import verified CC0 GLB assets
+on:
+  push:
+    branches: [feature/world-real-cc0-assets]
+    paths: [.github/workflows/import-cc0-assets.yml]
+permissions:
+  contents: write
+jobs:
+  import:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          persist-credentials: true
+      - name: Download pinned CC0 model files
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p assets/kenney
+          BASE=https://raw.githubusercontent.com/syuhei176/ai-game-assets/ebfd758dea8db5793c765cc72564efadb36a4ed0/models/environment
+          for name in tree_pine tree_oak rock_large building_house; do
+            curl --fail --location --retry 3 "$BASE/$name.glb" -o "assets/kenney/$name.glb"
+            test "$(stat -c%s "assets/kenney/$name.glb")" -gt 1000
+            test "$(head -c 4 "assets/kenney/$name.glb")" = "glTF"
+          done
+      - name: Save imported assets in this isolated feature branch
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add assets/kenney/*.glb
+          git diff --cached --quiet || (git commit -m "Import pinned Kenney CC0 3D assets" && git push origin HEAD:feature/world-real-cc0-assets)
