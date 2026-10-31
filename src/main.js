@@ -1,3 +1,4 @@
+import {loadCC0Assets} from './assets.js';
 import {loadState,saveState,act,step} from './gameplay.js';
 import * as THREE from 'three';
 const scene=new THREE.Scene();scene.background=new THREE.Color('#9fd4e8');scene.fog=new THREE.Fog('#9fd4e8',45,120);
@@ -14,6 +15,12 @@ for(let i=0;i<90;i++){const x=(rand()-.5)*90,z=(rand()-.5)*90;if(Math.abs(x)<4||
 mesh(new THREE.BoxGeometry(5,3.2,4),material('#e8c99b'),8,1.6,22);mesh(new THREE.BoxGeometry(6,.65,5),material('#965b49'),8,3.5,22);
 for(const x of [-8,-5])mesh(new THREE.BoxGeometry(.7,3.3,.7),material('#7b7b73'),x,1.65,37);mesh(new THREE.BoxGeometry(3.8,.7,.7),material('#7b7b73'),-6.5,3.4,37);
 const avatar=new THREE.Group();scene.add(avatar);const body=new THREE.Mesh(new THREE.CapsuleGeometry(.42,.8,5,10),material('#438064'));body.position.y=1;avatar.add(body);const head=new THREE.Mesh(new THREE.SphereGeometry(.42,16,12),material('#efc39c'));head.position.y=2;avatar.add(head);
+loadCC0Assets(scene,avatar).then(result=>{
+ if(avatar.userData.cc0AvatarLoaded){body.visible=false;head.visible=false;}
+ console.info('CC0 asset loading',result);
+ const info=document.getElementById('asset-status');
+ if(info)info.textContent=result.failed.length?'3D素材の一部が読めませんでした':'3D素材を読み込みました';
+}).catch(e=>console.error('CC0 assets',e));
 let state={x:0,z:0,yaw:0,fish:0,seed:false,key:false};try{Object.assign(state,JSON.parse(localStorage.getItem('world3d')||'{}'))}catch{}
 const gameplay=loadState(localStorage);gameplay.position={x:state.x,z:state.z};
 const status=document.getElementById('status');const say=s=>status.textContent=s;
