@@ -1,0 +1,33 @@
+name: Import CC0 Kenney 3D assets
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - '.github/workflows/import-kenney.yml'
+    branches: [feature/world-kenney-glb-assets]
+permissions:
+  contents: write
+jobs:
+  import:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          persist-credentials: true
+      - name: Fetch eight actual CC0 GLB assets
+        run: |
+          set -euo pipefail
+          mkdir -p assets/kenney/nature
+          for model in tree-oak tree-pinedefaulta tree-detailed rock-largea rock-smallb flower-reda plant-bush canoe; do
+            curl --fail --location --retry 3 "https://raw.githubusercontent.com/Hidencod/tge-assets/main/packs/nature-kit/${model}.glb" -o "assets/kenney/nature/${model}.glb"
+            test "$(wc -c < "assets/kenney/nature/${model}.glb")" -gt 1000
+            test "$(head -c 4 "assets/kenney/nature/${model}.glb")" = "glTF"
+          done
+      - name: Commit imported assets to feature branch only
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add assets/kenney/nature
+          git diff --cached --quiet || git commit -m "Import eight Kenney CC0 GLB assets"
+          git push origin HEAD:feature/world-kenney-glb-assets
