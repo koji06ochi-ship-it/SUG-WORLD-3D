@@ -10,8 +10,6 @@ var navigation := WorldNavigation.new()
 var overlay: PanelContainer
 var overlay_open := false
 var fish_attempts := 0
-var touch_forward := 0.0
-var touch_turn := 0.0
 var status: Label
 var touch_forward := 0.0
 var touch_turn := 0.0
