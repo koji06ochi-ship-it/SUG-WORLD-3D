@@ -1,0 +1,30 @@
+name: Xogot root Godot 4.4 validation
+on:
+  push:
+    branches: [xogot/root-project]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  godot-check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          persist-credentials: false
+      - name: Download Godot 4.4.1
+        run: |
+          curl --fail --location --retry 2 -o godot.zip https://github.com/godotengine/godot/releases/download/4.4.1-stable/Godot_v4.4.1-stable_linux.x86_64.zip
+          unzip -q godot.zip
+          chmod +x Godot_v4.4.1-stable_linux.x86_64
+      - name: Verify root project and parse
+        run: |
+          test -f project.godot
+          test -f main.tscn
+          test -f valley.gd
+          test -f world_state.gd
+          test -f navigation.gd
+          ./Godot_v4.4.1-stable_linux.x86_64 --headless --path . --import
+      - name: Start main scene
+        run: ./Godot_v4.4.1-stable_linux.x86_64 --headless --path . --quit-after 5
