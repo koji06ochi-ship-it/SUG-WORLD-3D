@@ -32,7 +32,7 @@ func _ready() -> void:
     status.text += " | " + journey.hint()
 
 func _refresh_status() -> void:
-    status.text = "S.u.G WORLD | Fish %d | Seeds %d | Planted %d" % [
+    status.text = "WORLD  F:%d  S:%d  G:%d" % [
         int(state.inventory.get("fish", 0)),
         int(state.inventory.get("seeds", 0)),
         int(state.garden.get("planted", 0))
@@ -159,7 +159,7 @@ func _create_ui() -> void:
     var layer := CanvasLayer.new()
     add_child(layer)
     var panel := VBoxContainer.new()
-    panel.position = Vector2(14, 80)
+    panel.position = Vector2(12, 18)
     layer.add_child(panel)
     status = Label.new()
     status.text = "S.u.G WORLD"
@@ -172,7 +172,7 @@ func _create_ui() -> void:
         button.pressed.connect(_action.bind(action))
         buttons.add_child(button)
     var touch_controls := HBoxContainer.new()
-    touch_controls.position = Vector2(18, 630)
+    touch_controls.position = Vector2(18, 680)
     layer.add_child(touch_controls)
     for spec in [["◀", -1.0, 0.0], ["▲", 0.0, 1.0], ["▼", 0.0, -1.0], ["▶", 1.0, 0.0]]:
         var key_button := Button.new()
@@ -288,4 +288,4 @@ func _physics_process(delta: float) -> void:
     player.move_and_slide()
     var target := player.global_position + Vector3(-sin(heading) * 5.5, 3.8, -cos(heading) * 6.5)
     camera.global_position = camera.global_position.lerp(target, min(1.0, delta * 6.0))
-    camera.look_at(player.global_position + Vector3(0, 1.0, 4.5))
+    camera.look_at(player.global_position + Vector3(0, 1.0, 5.8))
