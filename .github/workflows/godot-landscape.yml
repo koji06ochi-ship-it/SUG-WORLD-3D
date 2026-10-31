@@ -1,0 +1,20 @@
+name: Godot landscape build validation
+on:
+  push:
+    branches: [feature/godot-landscape-20261101]
+permissions:
+  contents: read
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          persist-credentials: false
+      - run: |
+          curl -fL --retry 2 -o godot.zip https://github.com/godotengine/godot/releases/download/4.4.1-stable/Godot_v4.4.1-stable_linux.x86_64.zip
+          unzip -q godot.zip
+          chmod +x Godot_v4.4.1-stable_linux.x86_64
+      - run: ./Godot_v4.4.1-stable_linux.x86_64 --headless --path . --import
+      - run: ./Godot_v4.4.1-stable_linux.x86_64 --headless --path . --quit-after 5
