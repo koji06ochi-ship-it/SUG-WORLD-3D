@@ -1,0 +1,30 @@
+name: Godot visual screenshot
+on:
+  push:
+    branches: [feature/world-integrated-vertical-slice]
+permissions:
+  contents: read
+jobs:
+  render:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          persist-credentials: false
+      - name: Install virtual display
+        run: sudo apt-get update -qq && sudo apt-get install -y -qq xvfb libgl1-mesa-dri
+      - name: Download Godot 4.4.1
+        run: |
+          curl --fail --location --retry 2 -o godot.zip https://github.com/godotengine/godot/releases/download/4.4.1-stable/Godot_v4.4.1-stable_linux.x86_64.zip
+          unzip -q godot.zip
+          chmod +x Godot_v4.4.1-stable_linux.x86_64
+      - name: Import
+        run: ./Godot_v4.4.1-stable_linux.x86_64 --headless --path . --import
+      - name: Render screenshot
+        run: xvfb-run -a ./Godot_v4.4.1-stable_linux.x86_64 --path . --rendering-method gl_compatibility --resolution 390x844 --script res://capture_world.gd
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: world-actual-render
+          path: world_actual_render.png
+          if-no-files-found: error
