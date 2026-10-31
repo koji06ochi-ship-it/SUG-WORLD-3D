@@ -112,6 +112,37 @@ func _create_player() -> void:
     outfit.albedo_color = Color("#397c61")
     visual.material_override = outfit
     player.add_child(visual)
+    # Temporary stylized character silhouette; official approved model is still required.
+    var head := MeshInstance3D.new()
+    var head_mesh := SphereMesh.new()
+    head_mesh.radius = 0.34
+    head_mesh.height = 0.68
+    head.mesh = head_mesh
+    head.position = Vector3(0, 0.91, 0)
+    var skin := StandardMaterial3D.new()
+    skin.albedo_color = Color("#e7b895")
+    head.material_override = skin
+    player.add_child(head)
+    var cap := MeshInstance3D.new()
+    var cap_mesh := SphereMesh.new()
+    cap_mesh.radius = 0.37
+    cap_mesh.height = 0.25
+    cap.mesh = cap_mesh
+    cap.position = Vector3(0, 1.22, 0)
+    var cap_material := StandardMaterial3D.new()
+    cap_material.albedo_color = Color("#2c6a46")
+    cap.material_override = cap_material
+    player.add_child(cap)
+    for side in [-1.0, 1.0]:
+        var foot := MeshInstance3D.new()
+        var foot_mesh := BoxMesh.new()
+        foot_mesh.size = Vector3(0.22, 0.16, 0.38)
+        foot.mesh = foot_mesh
+        foot.position = Vector3(side * 0.22, -0.71, 0.10)
+        var shoe := StandardMaterial3D.new()
+        shoe.albedo_color = Color("#543f39")
+        foot.material_override = shoe
+        player.add_child(foot)
     var collision := CollisionShape3D.new()
     var capsule := CapsuleShape3D.new()
     capsule.radius = 0.42
