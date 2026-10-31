@@ -1,3 +1,4 @@
+import {addScenery} from './environment.js';
 import {loadCC0Assets} from './assets.js';
 import {loadState,saveState,act,step} from './gameplay.js';
 import * as THREE from 'three';
@@ -15,6 +16,7 @@ for(let i=0;i<90;i++){const x=(rand()-.5)*90,z=(rand()-.5)*90;if(Math.abs(x)<4||
 mesh(new THREE.BoxGeometry(5,3.2,4),material('#e8c99b'),8,1.6,22);mesh(new THREE.BoxGeometry(6,.65,5),material('#965b49'),8,3.5,22);
 for(const x of [-8,-5])mesh(new THREE.BoxGeometry(.7,3.3,.7),material('#7b7b73'),x,1.65,37);mesh(new THREE.BoxGeometry(3.8,.7,.7),material('#7b7b73'),-6.5,3.4,37);
 const avatar=new THREE.Group();scene.add(avatar);const body=new THREE.Mesh(new THREE.CapsuleGeometry(.42,.8,5,10),material('#438064'));body.position.y=1;avatar.add(body);const head=new THREE.Mesh(new THREE.SphereGeometry(.42,16,12),material('#efc39c'));head.position.y=2;avatar.add(head);
+addScenery(scene).then(report=>{console.info('WORLD scenery GLB',report);const el=document.getElementById('scenery-status');if(el)el.textContent='景観素材 '+report.loaded.length+'/'+(report.loaded.length+report.failed.length)+' 読込';}).catch(console.error);
 loadCC0Assets(scene,avatar).then(result=>{
  if(avatar.userData.cc0AvatarLoaded){body.visible=false;head.visible=false;}
  console.info('CC0 asset loading',result);
