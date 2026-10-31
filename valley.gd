@@ -121,17 +121,17 @@ func _create_player() -> void:
     add_child(player)
     camera = Camera3D.new()
     camera.current = true
-    camera.fov = 60
+    camera.fov = 68
     add_child(camera)
 
 func _create_ui() -> void:
     var layer := CanvasLayer.new()
     add_child(layer)
     var panel := VBoxContainer.new()
-    panel.position = Vector2(18, 25)
+    panel.position = Vector2(14, 80)
     layer.add_child(panel)
     status = Label.new()
-    status.text = "S.u.G WORLD | Godot experiment"
+    status.text = "S.u.G WORLD"
     panel.add_child(status)
     var buttons := HBoxContainer.new()
     panel.add_child(buttons)
@@ -141,7 +141,7 @@ func _create_ui() -> void:
         button.pressed.connect(_action.bind(action))
         buttons.add_child(button)
     var touch_controls := HBoxContainer.new()
-    touch_controls.position = Vector2(18, 340)
+    touch_controls.position = Vector2(18, 630)
     layer.add_child(touch_controls)
     for spec in [["◀", -1.0, 0.0], ["▲", 0.0, 1.0], ["▼", 0.0, -1.0], ["▶", 1.0, 0.0]]:
         var key_button := Button.new()
@@ -255,6 +255,6 @@ func _physics_process(delta: float) -> void:
     player.velocity.z = direction.z * forward * 4.0
     player.velocity.y = 0
     player.move_and_slide()
-    var target := player.global_position + Vector3(-sin(heading) * 7, 5, -cos(heading) * 8)
+    var target := player.global_position + Vector3(-sin(heading) * 5.5, 3.8, -cos(heading) * 6.5)
     camera.global_position = camera.global_position.lerp(target, min(1.0, delta * 6.0))
-    camera.look_at(player.global_position + Vector3(0, 1, 2))
+    camera.look_at(player.global_position + Vector3(0, 1.0, 4.5))
