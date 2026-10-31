@@ -65,6 +65,13 @@ static func install(scene: Node3D) -> void:
         _box(root, "WindowBar", Vector3(0.09, 1.0, 0.16), Vector3(x, 2.15, 19.84), "#6c4937")
     for x in [5.3, 10.7]:
         _box(root, "CottageBeam", Vector3(0.18, 3.3, 0.2), Vector3(x, 1.65, 19.9), "#74503b")
+    # Roof trim, chimney and front step.
+    _box(root, "RoofTrim", Vector3(6.25, 0.16, 5.2), Vector3(8, 3.84, 22), "#684437")
+    _box(root, "Chimney", Vector3(0.72, 1.6, 0.72), Vector3(9.5, 4.35, 23.1), "#8c5a49")
+    _box(root, "FrontStep", Vector3(2.2, 0.18, 1.1), Vector3(8, 0.12, 19.1), "#aa9d86")
+    for i in range(5):
+        _box(root, "FencePost", Vector3(0.15, 0.8, 0.15), Vector3(5.6 + float(i) * 1.4, 0.4, 8.4), "#9d7854")
+    _box(root, "FenceRail", Vector3(6.0, 0.12, 0.12), Vector3(8.4, 0.58, 8.4), "#a98760")
     # Garden beds and low fencing placed to the side of the path.
     for bed in range(3):
         var z := 11.0 + float(bed) * 2.6
