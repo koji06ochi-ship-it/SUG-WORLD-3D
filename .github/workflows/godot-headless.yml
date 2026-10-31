@@ -1,0 +1,22 @@
+name: Godot headless validation
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          persist-credentials: false
+      - name: Download pinned Godot editor
+        run: |
+          curl --fail --location --retry 2 -o godot.zip https://github.com/godotengine/godot/releases/download/4.4.1-stable/Godot_v4.4.1-stable_linux.x86_64.zip
+          unzip -q godot.zip
+          chmod +x Godot_v4.4.1-stable_linux.x86_64
+      - name: Import and parse project
+        run: ./Godot_v4.4.1-stable_linux.x86_64 --headless --path godot --import
+      - name: Start scene headlessly
+        run: ./Godot_v4.4.1-stable_linux.x86_64 --headless --path godot --quit-after 3
