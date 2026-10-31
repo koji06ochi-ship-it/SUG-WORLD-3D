@@ -27,16 +27,16 @@ static func install(scene: Node3D) -> void:
     root.name = "ImportedKenneyCC0"
     scene.add_child(root)
     var positions := [
-        ["tree-oak", Vector3(15, 0.0, 13), 5.0],
-        ["tree-oak", Vector3(-23, 0.0, 11), 5.8],
-        ["tree-pinedefaulta", Vector3(19, 0.0, 30), 6.0],
-        ["tree-pinedefaulta", Vector3(-26, 0.0, 35), 5.5],
-        ["tree-detailed", Vector3(24, 0.0, 7), 5.0],
-        ["rock-largea", Vector3(-22, 0.0, 29), 3.0],
-        ["rock-smallb", Vector3(16, 0.0, 23), 2.5],
-        ["plant-bush", Vector3(12, 0.0, 19), 4.0],
-        ["flower-reda", Vector3(7, 0.0, 12), 4.0],
-        ["canoe", Vector3(-17, 0.2, 18), 4.0]
+        ["tree-oak", Vector3(6.2, 0.0, 10), 5.0],
+        ["tree-oak", Vector3(-7.5, 0.0, 11), 5.8],
+        ["tree-pinedefaulta", Vector3(7.5, 0.0, 19), 6.0],
+        ["tree-pinedefaulta", Vector3(-8.5, 0.0, 17), 5.5],
+        ["tree-detailed", Vector3(9.0, 0.0, 8), 5.0],
+        ["rock-largea", Vector3(-6.0, 0.0, 7), 3.0],
+        ["rock-smallb", Vector3(6.0, 0.0, 8), 2.5],
+        ["plant-bush", Vector3(5.8, 0.0, 15), 4.0],
+        ["flower-reda", Vector3(5.5, 0.0, 6), 4.0],
+        ["canoe", Vector3(-13, 0.2, 20), 4.0]
     ]
     var count := 0
     for item in positions:
