@@ -5,13 +5,20 @@ var camera: Camera3D
 var heading := 0.0
 var lake_position := Vector3(-12, 0, 22)
 var house_position := Vector3(8, 0, 22)
-var inventory := {"fish": 0, "key": 0, "seeds": 0}
+var state := WorldState.new()
+var navigation := WorldNavigation.new()
+var overlay: PanelContainer
+var overlay_open := false
+var fish_attempts := 0
 var status: Label
 
 func _ready() -> void:
     _create_environment()
     _create_player()
     _create_ui()
+    if state.load_save():
+        player.position = state.world_position
+        fish_attempts = int(state.inventory.get("fish", 0))
 
 func _make_box(name: String, pos: Vector3, size: Vector3, color: Color) -> StaticBody3D:
     var body := StaticBody3D.new()
@@ -110,28 +117,60 @@ func _create_ui() -> void:
     panel.add_child(status)
     var buttons := HBoxContainer.new()
     panel.add_child(buttons)
-    for action in ["Fish", "Search", "Garden"]:
+    for action in ["Fish", "Search", "Garden", "Save", "SAFE"]:
         var button := Button.new()
         button.text = action
         button.pressed.connect(_action.bind(action))
         buttons.add_child(button)
+    overlay = PanelContainer.new()
+    overlay.position = Vector2(20, 110)
+    overlay.custom_minimum_size = Vector2(330, 130)
+    overlay.visible = false
+    layer.add_child(overlay)
+    var content := VBoxContainer.new()
+    overlay.add_child(content)
+    var text := Label.new()
+    text.text = "15 | SAFE\n緊急時：119／110\n通信・ログイン不要"
+    content.add_child(text)
+    var back := Button.new()
+    back.text = "ゲームに戻る"
+    back.pressed.connect(_close_overlay)
+    content.add_child(back)
+
+func _close_overlay() -> void:
+    overlay.visible = false
+    overlay_open = false
+    navigation.back()
+    player.position = state.world_position
 
 func _action(action: String) -> void:
+    if action == "Save":
+        state.world_position = player.position
+        status.text = "保存しました" if state.save() else "保存失敗"
+        return
+    if action == "SAFE":
+        state.world_position = player.position
+        navigation.open_screen("15", player.position)
+        overlay.visible = true
+        overlay_open = true
+        return
+    if overlay_open:
+        return
     if action == "Fish":
         if player.position.distance_to(lake_position) > 15:
             status.text = "湖に近づこう"
         else:
-            inventory["fish"] += 1
+            fish_attempts += 1
+            state.award_once("fish_%d" % fish_attempts, "fish", 1)
             status.text = "魚が釣れた"
-            if inventory["fish"] == 2:
-                inventory["key"] += 1
+            if fish_attempts == 2 and state.award_once("lake_key_first", "key", 1):
                 status.text = "古い鍵が釣れた！"
     elif action == "Search":
-        inventory["seeds"] += 1
-        status.text = "種を発見した"
+        status.text = "種を発見した" if state.award_once("seed_first", "seeds", 1) else "ここはもう調べた"
     elif action == "Garden":
-        if player.position.distance_to(house_position) < 7 and inventory["seeds"] > 0:
-            inventory["seeds"] -= 1
+        if player.position.distance_to(house_position) < 7 and int(state.inventory.get("seeds", 0)) > 0:
+            state.inventory["seeds"] = int(state.inventory["seeds"]) - 1
+            state.garden["planted"] = int(state.garden.get("planted", 0)) + 1
             status.text = "庭に種を植えた"
         else:
             status.text = "種を持って家に近づこう"
@@ -139,6 +178,9 @@ func _action(action: String) -> void:
 func _physics_process(delta: float) -> void:
     var forward := (1.0 if (Input.is_key_pressed(KEY_W) or Input.is_key_pressed(KEY_UP)) else 0.0) - (1.0 if (Input.is_key_pressed(KEY_S) or Input.is_key_pressed(KEY_DOWN)) else 0.0)
     var turn := (1.0 if (Input.is_key_pressed(KEY_D) or Input.is_key_pressed(KEY_RIGHT)) else 0.0) - (1.0 if (Input.is_key_pressed(KEY_A) or Input.is_key_pressed(KEY_LEFT)) else 0.0)
+    if overlay_open:
+        forward = 0.0
+        turn = 0.0
     heading += turn * delta * 1.8
     player.rotation.y = heading
     var direction := Vector3(sin(heading), 0, cos(heading))
