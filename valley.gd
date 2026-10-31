@@ -60,8 +60,8 @@ func _create_environment() -> void:
     sun.rotation_degrees = Vector3(-50, -30, 0)
     sun.light_energy = 1.4
     add_child(sun)
-    _make_box("Ground", Vector3(0, -0.3, 0), Vector3(100, 0.6, 100), Color("#78a968"))
-    _make_box("Path", Vector3(0, 0.03, 17), Vector3(5, 0.06, 65), Color("#cbb589"))
+    WorldTerrain.create(self)
+    # Road is vertex-painted onto terrain.
     _make_box("Lake", Vector3(-12, 0.07, 22), Vector3(20, 0.08, 12), Color("#4cabb9"))
     _make_box("Cottage", Vector3(8, 1.6, 22), Vector3(5, 3.2, 4), Color("#e5c69b"))
     _make_box("Roof", Vector3(8, 3.5, 22), Vector3(6, 0.6, 5), Color("#9b624b"))
