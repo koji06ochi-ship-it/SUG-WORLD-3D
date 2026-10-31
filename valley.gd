@@ -22,6 +22,7 @@ func _ready() -> void:
     _create_environment()
     WorldArtPass.install(self)
     WorldLandscape.install(self)
+    WorldImportedAssets.install(self)
     _create_player()
     _create_ui()
     set_process_unhandled_input(true)
