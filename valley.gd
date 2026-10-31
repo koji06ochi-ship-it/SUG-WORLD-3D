@@ -19,6 +19,7 @@ var touch_turn := 0.0
 
 func _ready() -> void:
     _create_environment()
+    WorldArtPass.install(self)
     _create_player()
     _create_ui()
     set_process_unhandled_input(true)
