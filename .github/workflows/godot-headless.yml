@@ -1,5 +1,7 @@
 name: Godot headless validation
 on:
+  push:
+    branches: [experiment/godot-valley]
   workflow_dispatch:
 permissions:
   contents: read
