@@ -27,6 +27,10 @@ static func install(parent: Node3D) -> void:
     var root := Node3D.new()
     root.name = "KenneyCC0Models"
     parent.add_child(root)
+    # Visible GLB showcase along the starting route, clear of the walkable corridor.
+    _spawn(root, TREE_PINE, Vector3(5.8, 0, 10), 4.5)
+    _spawn(root, TREE_OAK, Vector3(-6.5, 0, 16), 4.5)
+    _spawn(root, ROCK, Vector3(5.8, 0, 15), 2.2)
     # Real mesh assets; leave gameplay paths and lake clear.
     var rng := RandomNumberGenerator.new()
     rng.seed = 20261103
