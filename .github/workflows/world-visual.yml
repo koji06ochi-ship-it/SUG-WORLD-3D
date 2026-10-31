@@ -1,7 +1,7 @@
-name: WORLD visual rebuild screenshot
+name: WORLD Kenney GLB screenshot
 on:
   push:
-    branches: [feature/world-visual-rebuild-02]
+    branches: [feature/world-kenney-glb-assets]
 permissions:
   contents: read
 jobs:
@@ -25,6 +25,6 @@ jobs:
         run: xvfb-run -a ./Godot_v4.4.1-stable_linux.x86_64 --path . --rendering-method gl_compatibility --resolution 390x844 --script res://capture_world.gd
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
-          name: world-rebuild-02-render
+          name: world-kenney-glb-render
           path: world_actual_render.png
           if-no-files-found: error
