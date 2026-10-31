@@ -18,7 +18,9 @@ var touch_forward := 0.0
 var touch_turn := 0.0
 
 func _ready() -> void:
-    _create_environment()
+    var landscape := preload("res://landscape.gd").new()
+    landscape.name = "WORLD_Landscape"
+    add_child(landscape)
     _create_player()
     _create_ui()
     set_process_unhandled_input(true)
