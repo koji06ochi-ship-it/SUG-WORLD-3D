@@ -27,6 +27,14 @@ func _ready() -> void:
     if state.load_save():
         player.position = state.world_position
         fish_attempts = int(state.inventory.get("fish", 0))
+    _refresh_status()
+
+func _refresh_status() -> void:
+    status.text = "S.u.G WORLD | Fish %d | Seeds %d | Planted %d" % [
+        int(state.inventory.get("fish", 0)),
+        int(state.inventory.get("seeds", 0)),
+        int(state.garden.get("planted", 0))
+    ]
 
 func _make_box(name: String, pos: Vector3, size: Vector3, color: Color) -> StaticBody3D:
     var body := StaticBody3D.new()
