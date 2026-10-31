@@ -124,16 +124,6 @@ func _create_ui() -> void:
         button.text = action
         button.pressed.connect(_action.bind(action))
         buttons.add_child(button)
-    var controls := HBoxContainer.new()
-    controls.position = Vector2(20, 480)
-    layer.add_child(controls)
-    for spec in [["↶", -1.0, 0.0], ["↑", 0.0, 1.0], ["↓", 0.0, -1.0], ["↷", 1.0, 0.0]]:
-        var key := Button.new()
-        key.text = str(spec[0])
-        key.custom_minimum_size = Vector2(70, 72)
-        key.button_down.connect(_touch_input.bind(float(spec[1]), float(spec[2])))
-        key.button_up.connect(_touch_input.bind(0.0, 0.0))
-        controls.add_child(key)
     var touch_controls := HBoxContainer.new()
     touch_controls.position = Vector2(18, 340)
     layer.add_child(touch_controls)
@@ -205,17 +195,11 @@ func _action(action: String) -> void:
         else:
             status.text = "種を持って家に近づこう"
 
-func _touch_input(turn_value: float, forward_value: float) -> void:
-    touch_turn = turn_value
-    touch_forward = forward_value
-
 func _physics_process(delta: float) -> void:
     var forward := (1.0 if (Input.is_key_pressed(KEY_W) or Input.is_key_pressed(KEY_UP)) else 0.0) - (1.0 if (Input.is_key_pressed(KEY_S) or Input.is_key_pressed(KEY_DOWN)) else 0.0)
     var turn := (1.0 if (Input.is_key_pressed(KEY_D) or Input.is_key_pressed(KEY_RIGHT)) else 0.0) - (1.0 if (Input.is_key_pressed(KEY_A) or Input.is_key_pressed(KEY_LEFT)) else 0.0)
     forward = clampf(forward + touch_forward, -1.0, 1.0)
     turn = clampf(turn + touch_turn, -1.0, 1.0)
-    forward += touch_forward
-    turn += touch_turn
     if overlay_open:
         forward = 0.0
         turn = 0.0
