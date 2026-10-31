@@ -10,6 +10,8 @@ var navigation := WorldNavigation.new()
 var overlay: PanelContainer
 var overlay_open := false
 var fish_attempts := 0
+var touch_forward := 0.0
+var touch_turn := 0.0
 var status: Label
 var touch_forward := 0.0
 var touch_turn := 0.0
@@ -134,6 +136,16 @@ func _create_ui() -> void:
         key.button_down.connect(_touch_input.bind(float(spec[1]), float(spec[2])))
         key.button_up.connect(_touch_input.bind(0.0, 0.0))
         controls.add_child(key)
+    var touch_controls := HBoxContainer.new()
+    touch_controls.position = Vector2(18, 340)
+    layer.add_child(touch_controls)
+    for spec in [["◀", -1.0, 0.0], ["▲", 0.0, 1.0], ["▼", 0.0, -1.0], ["▶", 1.0, 0.0]]:
+        var key_button := Button.new()
+        key_button.text = str(spec[0])
+        key_button.custom_minimum_size = Vector2(72, 72)
+        key_button.button_down.connect(_touch_down.bind(float(spec[1]), float(spec[2])))
+        key_button.button_up.connect(_touch_up)
+        touch_controls.add_child(key_button)
     overlay = PanelContainer.new()
     overlay.position = Vector2(20, 110)
     overlay.custom_minimum_size = Vector2(330, 130)
@@ -148,6 +160,14 @@ func _create_ui() -> void:
     back.text = "ゲームに戻る"
     back.pressed.connect(_close_overlay)
     content.add_child(back)
+
+func _touch_down(turn_value: float, forward_value: float) -> void:
+    touch_turn = turn_value
+    touch_forward = forward_value
+
+func _touch_up() -> void:
+    touch_turn = 0.0
+    touch_forward = 0.0
 
 func _close_overlay() -> void:
     overlay.visible = false
@@ -196,6 +216,8 @@ func _physics_process(delta: float) -> void:
     var turn := (1.0 if (Input.is_key_pressed(KEY_D) or Input.is_key_pressed(KEY_RIGHT)) else 0.0) - (1.0 if (Input.is_key_pressed(KEY_A) or Input.is_key_pressed(KEY_LEFT)) else 0.0)
     forward = clampf(forward + touch_forward, -1.0, 1.0)
     turn = clampf(turn + touch_turn, -1.0, 1.0)
+    forward += touch_forward
+    turn += touch_turn
     if overlay_open:
         forward = 0.0
         turn = 0.0
